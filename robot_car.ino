@@ -16,6 +16,12 @@ AF_DCMotor motor2(2, MOTOR12_1KHZ);
 AF_DCMotor motor3(3, MOTOR34_1KHZ);
 AF_DCMotor motor4(4, MOTOR34_1KHZ);
 
+const int trigPin = A0;
+const int echoPin = A1;
+bool ultraPilot = false;
+long max_obs_dist = 20;
+int rot_delay_ultraPilot = 1; // seconds
+
 int motor1_speed = 40;
 int motor2_speed = 255;
 int motor3_speed = 255;
@@ -38,18 +44,20 @@ void setup()
 {
   bluetoothSerial.begin(9600);  //Set the baud rate to your Bluetooth module.
   Serial.begin(9600); // Initialize serial communication at 9600 bits per second
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 }
 
 void loop() {
-  Serial.println(analogRead(sensorMiddle)); // Print the value to the serial monitor
-
+  //Serial.println(analogRead(sensorMiddle)); // Print the value to the serial monitor
+  //Serial.println(measureDist());
   if (bluetoothSerial.available() > 0) {
     command = bluetoothSerial.read();
 
     Stop(); //initialize with motors stoped
-    // if (command != 'S') {
-    //   Serial.println(command);
-    // }
+    if (command != 'S') {
+      Serial.println(command);
+    }
     if (followLine) {
       // Serial.println("Following Line");
       followLineFunc();
@@ -58,6 +66,14 @@ void loop() {
         followLine = false;
       }
     } 
+    else if (ultraPilot) {
+      ultraPilotFunc();
+      if (command == 'v'){
+        Serial.println("Stop autopilot");
+        ultraPilot = false;
+        Stop();
+      }
+    }
     else {
       switch (command) {
         case 'F':
@@ -75,6 +91,10 @@ void loop() {
         case 'X':
           Serial.println("Follow Line");
           followLine = true;
+          break;
+        case 'V':
+          // auto-pilot with obstacle avoidance.
+          ultraPilot = true;
           break;
       }
     }
@@ -100,6 +120,39 @@ void followLineFunc()
     right();
   }
 
+}
+
+
+long measureDist(){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  long duration = pulseIn(echoPin, HIGH);
+  
+  // Calculate distance in cm
+  long distance_cm = duration / 29 / 2;
+  
+  // Serial.print("Distance: ");
+  // Serial.print(distance_cm);
+  // Serial.println(" cm");
+  return distance_cm;
+}
+
+void ultraPilotFunc(){
+  if (!ultraPilot) {  // due to delay, this is mandatory.
+    return;
+  }
+  long obs_dist = measureDist();
+  if (obs_dist <= max_obs_dist) {
+    right();
+    delay(rot_delay_ultraPilot * 1000);
+  } else {
+    forward();
+  }
 }
 
 void left()
