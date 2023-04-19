@@ -2,6 +2,7 @@
   Install Adafruit Motor Shield Library before uploading this code.
   AFMotor Library https://learn.adafruit.com/adafruit-motor-shield/library-install
   Tutorial on how to install: https://youtu.be/vooJEyco1J4
+  Important notice: Switch off the battery switch before connecting the Arduino board to pc.
 */
 
 #include <AFMotor.h>
@@ -20,10 +21,13 @@ int motor2_speed = 255;
 int motor3_speed = 255;
 int motor4_speed = 100;
 
+int motor_rotate_speed = 255;
+
 char command;
 
 bool followLine = false;
-int dark_value = 25;
+int prev_dir = 1;
+int dark_value = 500; // above this value -> detects dark line.
 int sensor_limit = 100;
 const int sensorMiddle = A5; // Analog input pin for the sensor
 int sensorMiddleValue = 0; // Variable to store the sensor value
@@ -38,7 +42,7 @@ void setup()
 }
 
 void loop() {
-  // Serial.println(analogRead(sensorLeft)); // Print the value to the serial monitor
+  Serial.println(analogRead(sensorMiddle)); // Print the value to the serial monitor
 
   if (bluetoothSerial.available() > 0) {
     command = bluetoothSerial.read();
@@ -53,6 +57,7 @@ void loop() {
       if (command == 'x'){
         Serial.println("Unfollow Line");
         followLine = false;
+        prev_dir = 1;
       }
     } 
     else {
@@ -80,26 +85,36 @@ void loop() {
 
 void followLineFunc()
 {
-  Serial.println(command);
+  // Serial.println(command);
   //sensorMiddleValue = analogRead(sensorMiddle);
-  if (sensorOnLine(sensorMiddle)) {
-    // moves forward
-    //Serial.println("Go Forward");
-  } else if (sensorOnLine(sensorRight)) {
-    // goes right
-    //Serial.println("Go Right");
-  } else if (sensorOnLine(sensorLeft)) {
-    // goes left
-    //Serial.println("Go Left");
+  int middle_value = analogRead(sensorMiddle);
+  int right_value = analogRead(sensorRight);
+  int left_value = analogRead(sensorLeft);
+
+  // if sensor's value is greater than dark value -> sensor is on black line 
+  if (middle_value >= dark_value) {
+    forward();
+  } else if (left_value >= dark_value && right_value < dark_value) {
+    left();
+  } else if (left_value < dark_value && right_value >= dark_value) {
+    right();
   } else {
-    //Serial.println("Stop");
+    // both left and right sensors detect the line, go straight
+    right();
   }
 
 }
 
 bool sensorOnLine(int sensor) {
   // if sensor's value is greater than dark value -> sensor is on black line 
-  if (analogRead(sensor) >= dark_value && analogRead(sensor) <= sensor_limit) {
+  int read = analogRead(sensor);
+  if (read >= sensor_limit) {
+    // goes here if robot is not on the ground.
+    Stop();
+    return false;
+  }
+
+  if (read >= dark_value) {
     return true;
   } else {
     return false;
@@ -108,25 +123,25 @@ bool sensorOnLine(int sensor) {
 
 void left()
 {
-  motor1.setSpeed(motor1_speed); //Define maximum velocity
+  motor1.setSpeed(motor_rotate_speed); //Define maximum velocity
   motor1.run(FORWARD);  //rotate the motor clockwise
-  motor2.setSpeed(motor2_speed); //Define maximum velocity
+  motor2.setSpeed(motor_rotate_speed); //Define maximum velocity
   motor2.run(FORWARD);  //rotate the motor clockwise
-  motor3.setSpeed(motor3_speed); //Define maximum velocity
+  motor3.setSpeed(motor_rotate_speed); //Define maximum velocity
   motor3.run(FORWARD);  //rotate the motor clockwise
-  motor4.setSpeed(motor4_speed); //Define maximum velocity
+  motor4.setSpeed(motor_rotate_speed); //Define maximum velocity
   motor4.run(FORWARD);  //rotate the motor clockwise
 }
 
 void right()
 {
-  motor1.setSpeed(motor1_speed); //Define maximum velocity
+  motor1.setSpeed(motor_rotate_speed); //Define maximum velocity
   motor1.run(BACKWARD); //rotate the motor anti-clockwise
-  motor2.setSpeed(motor2_speed); //Define maximum velocity
+  motor2.setSpeed(motor_rotate_speed); //Define maximum velocity
   motor2.run(BACKWARD); //rotate the motor anti-clockwise
-  motor3.setSpeed(motor3_speed); //Define maximum velocity
+  motor3.setSpeed(motor_rotate_speed); //Define maximum velocity
   motor3.run(BACKWARD); //rotate the motor anti-clockwise
-  motor4.setSpeed(motor4_speed); //Define maximum velocity
+  motor4.setSpeed(motor_rotate_speed); //Define maximum velocity
   motor4.run(BACKWARD); //rotate the motor anti-clockwise
 }
 
