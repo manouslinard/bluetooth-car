@@ -19,7 +19,7 @@ AF_DCMotor motor4(4, MOTOR34_1KHZ);
 const int trigPin = A0;
 const int echoPin = A1;
 bool ultraPilot = false;
-long max_obs_dist = 20;
+long max_obs_dist = 30;
 int rot_delay_ultraPilot = 1; // seconds
 
 int motor1_speed = 150;
@@ -147,11 +147,11 @@ void ultraPilotFunc(){
     return;
   }
   long obs_dist = measureDist();
-  if (obs_dist <= max_obs_dist) {
+  if (obs_dist > max_obs_dist) {
+    forward();
+  } else {
     right();
     delay(rot_delay_ultraPilot * 1000);
-  } else {
-    forward();
   }
 }
 
