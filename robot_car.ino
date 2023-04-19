@@ -26,7 +26,6 @@ int motor_rotate_speed = 255;
 char command;
 
 bool followLine = false;
-int prev_dir = 1;
 int dark_value = 500; // above this value -> detects dark line.
 int sensor_limit = 100;
 const int sensorMiddle = A5; // Analog input pin for the sensor
@@ -57,7 +56,6 @@ void loop() {
       if (command == 'x'){
         Serial.println("Unfollow Line");
         followLine = false;
-        prev_dir = 1;
       }
     } 
     else {
@@ -86,7 +84,6 @@ void loop() {
 void followLineFunc()
 {
   // Serial.println(command);
-  //sensorMiddleValue = analogRead(sensorMiddle);
   int middle_value = analogRead(sensorMiddle);
   int right_value = analogRead(sensorRight);
   int left_value = analogRead(sensorLeft);
@@ -99,26 +96,10 @@ void followLineFunc()
   } else if (left_value < dark_value && right_value >= dark_value) {
     right();
   } else {
-    // both left and right sensors detect the line, go straight
+    // goes right when line not found.
     right();
   }
 
-}
-
-bool sensorOnLine(int sensor) {
-  // if sensor's value is greater than dark value -> sensor is on black line 
-  int read = analogRead(sensor);
-  if (read >= sensor_limit) {
-    // goes here if robot is not on the ground.
-    Stop();
-    return false;
-  }
-
-  if (read >= dark_value) {
-    return true;
-  } else {
-    return false;
-  }
 }
 
 void left()
