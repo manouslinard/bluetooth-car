@@ -21,7 +21,7 @@ int motor2_speed = 255;
 int motor3_speed = 255;
 int motor4_speed = 100;
 
-int motor_rotate_speed = 255;
+int motor_rotate_speed = 150;
 
 char command;
 
