@@ -43,24 +43,27 @@ public class MainActivity extends AppCompatActivity {
     private int REQUEST_BLUETOOTH_PERMISSION = 1;
     private static final String BLUETOOTH_PERMISSION = Manifest.permission.BLUETOOTH;
     private Map<String, BluetoothDevice> bluetoothDevices;
-
+    private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private OutputStream outputStream = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        bluetoothDevices = new HashMap<String, BluetoothDevice>();
-        initMovementButtons();
-        // Request Bluetooth permission if not granted already
-        if (ContextCompat.checkSelfPermission(this, BLUETOOTH_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{BLUETOOTH_PERMISSION}, REQUEST_BLUETOOTH_PERMISSION);
-        } else {
-            // Bluetooth permission already granted, proceed with Bluetooth operations
-            // ...
-        }
-        bluetoothList.add("No Devices Available");  // remove this when bluetooth devices found (use bluetoothList.remove(0);)
-
-        initBluetoothList(bluetoothList);   // sets the values of the list to dropdown list in gui.
+//        bluetoothDevices = new HashMap<String, BluetoothDevice>();
+//        initMovementButtons();
+//        // Request Bluetooth permission if not granted already
+//        if (ContextCompat.checkSelfPermission(this, BLUETOOTH_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[]{BLUETOOTH_PERMISSION}, REQUEST_BLUETOOTH_PERMISSION);
+//        } else {
+//            // Bluetooth permission already granted, proceed with Bluetooth operations
+//            // ...
+//        }
+//        bluetoothList.add("No Devices Available");  // remove this when bluetooth devices found (use bluetoothList.remove(0);)
+//
+//        initBluetoothList(bluetoothList);   // sets the values of the list to dropdown list in gui.
+        String address = "00:21:13:00:26:FF";
+        connectToAddress(address);
     }
 
     private void initMovementButtons() {
@@ -119,6 +122,47 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void connectToAddress(String deviceAddress) {
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        BluetoothDevice bluetoothDevice = bluetoothAdapter.getRemoteDevice(deviceAddress); // deviceAddress is the address of the Bluetooth device
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        BluetoothSocket btSocket = null; // uuid is the UUID of the Bluetooth service that the device uses
+        try {
+            btSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //bluetoothAdapter.cancelDiscovery(); // cancel discovery as it will slow down the connection
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        try {
+            btSocket.connect(); // connect to the device
+            Toast.makeText(MainActivity.this, "Connected to device", Toast.LENGTH_SHORT).show();
+            outputStream = null;
+            try {
+                outputStream = btSocket.getOutputStream();
+                sendCharToArduino('F');
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            Toast.makeText(MainActivity.this, "Could not connect to device", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+    // Method to send a character to Arduino via Bluetooth
+    public void sendCharToArduino(char c) {
+        try {
+            outputStream.write(c);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void initBluetoothList(ArrayList<String> bluetoothList) {
         Spinner spinner = findViewById(R.id.bluet_list);
 
@@ -134,7 +178,13 @@ public class MainActivity extends AppCompatActivity {
                 String selectedItem = (String) adapterView.getItemAtPosition(i);
                 // Do something with the selected item, such as connecting to the Bluetooth device
                 connectBluetooth(selectedItem);
-                Toast.makeText(MainActivity.this, ""+bluetoothDevices.get(selectedItem), Toast.LENGTH_SHORT).show();
+                BluetoothDevice b = bluetoothDevices.get(selectedItem);
+                if (b!=null){
+                    //Toast.makeText(MainActivity.this, ""+bluetoothDevices.get(selectedItem), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, ""+b.getAddress(), Toast.LENGTH_SHORT).show();
+                    String address = "00:21:13:00:16:FF";
+
+                }
             }
 
             @Override
