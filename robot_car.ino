@@ -158,9 +158,9 @@ void ultraPilotFunc(){
 void left()
 {
   motor1.setSpeed(255); //Define maximum velocity
-  motor1.run(FORWARD);  //rotate the motor clockwise
+  motor1.run(BACKWARD);  //rotate the motor clockwise
   motor2.setSpeed(motor_rotate_speed); //Define maximum velocity
-  motor2.run(FORWARD);  //rotate the motor clockwise
+  motor2.run(BACKWARD);  //rotate the motor clockwise
   motor3.setSpeed(motor_rotate_speed); //Define maximum velocity
   motor3.run(FORWARD);  //rotate the motor clockwise
   motor4.setSpeed(motor_rotate_speed); //Define maximum velocity
@@ -170,9 +170,9 @@ void left()
 void right()
 {
   motor1.setSpeed(motor_rotate_speed); //Define maximum velocity
-  motor1.run(BACKWARD); //rotate the motor anti-clockwise
+  motor1.run(FORWARD); //rotate the motor anti-clockwise
   motor2.setSpeed(motor_rotate_speed); //Define maximum velocity
-  motor2.run(BACKWARD); //rotate the motor anti-clockwise
+  motor2.run(FORWARD); //rotate the motor anti-clockwise
   motor3.setSpeed(motor_rotate_speed); //Define maximum velocity
   motor3.run(BACKWARD); //rotate the motor anti-clockwise
   motor4.setSpeed(motor_rotate_speed); //Define maximum velocity
@@ -182,9 +182,9 @@ void right()
 void forward()
 {
   motor1.setSpeed(motor1_speed); //Define maximum velocity
-  motor1.run(BACKWARD); //rotate the motor anti-clockwise
+  motor1.run(FORWARD); //rotate the motor anti-clockwise
   motor2.setSpeed(motor2_speed); //Define maximum velocity
-  motor2.run(BACKWARD); //rotate the motor anti-clockwise
+  motor2.run(FORWARD); //rotate the motor anti-clockwise
   motor3.setSpeed(motor3_speed); //Define maximum velocity
   motor3.run(FORWARD);  //rotate the motor clockwise
   motor4.setSpeed(motor4_speed); //Define maximum velocity
@@ -194,9 +194,9 @@ void forward()
 void back()
 {
   motor1.setSpeed(motor1_speed); //Define maximum velocity
-  motor1.run(FORWARD);  //rotate the motor clockwise
+  motor1.run(BACKWARD);  //rotate the motor clockwise
   motor2.setSpeed(motor2_speed); //Define maximum velocity
-  motor2.run(FORWARD);  //rotate the motor clockwise
+  motor2.run(BACKWARD);  //rotate the motor clockwise
   motor3.setSpeed(motor3_speed); //Define maximum velocity
   motor3.run(BACKWARD); //rotate the motor anti-clockwise
   motor4.setSpeed(motor4_speed); //Define maximum velocity
