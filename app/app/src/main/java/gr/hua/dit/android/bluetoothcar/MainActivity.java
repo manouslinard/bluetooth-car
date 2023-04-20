@@ -94,6 +94,12 @@ public class MainActivity extends AppCompatActivity {
             sendCharToArduino('L');
         });
 
+
+        right_btn.setOnClickListener(v -> {
+            sendCharToArduino('R');
+        });
+        // ====================================================
+
         connect_btn.setOnClickListener(v->{
             if (selectedItem == null) {
                 return;
@@ -103,11 +109,6 @@ public class MainActivity extends AppCompatActivity {
                 connectToAddress(b.getAddress());
             }
         });
-
-        right_btn.setOnClickListener(v -> {
-            sendCharToArduino('R');
-        });
-        // ====================================================
 
         // Switches Initialized ===============================
         autoSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -222,58 +223,17 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 // Start a new thread to connect to the selected Bluetooth device
                 new Thread(() -> {
-                    try {
-                        BluetoothDevice selectedDevice = null;
-                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                            return;
+                    BluetoothDevice selectedDevice = null;
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        return;
+                    }
+                    Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+                    if (pairedDevices.size() > 0) {
+                        bluetoothList.clear(); // Clear the list before adding new devices
+                        for (BluetoothDevice device : pairedDevices) {
+                            bluetoothList.add(device.getName());
+                            bluetoothDevices.put(device.getName(), device);
                         }
-                        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-                        if (pairedDevices.size() > 0) {
-                            bluetoothList.clear(); // Clear the list before adding new devices
-                            for (BluetoothDevice device : pairedDevices) {
-                                // String deviceNameAddress = device.getName() + "\n" + device.getAddress();
-                                bluetoothList.add(device.getName());
-                                bluetoothDevices.put(device.getName(), device);
-                                if (device.getName().equals(selectedItem)) {
-                                    selectedDevice = device;
-                                }
-                            }
-                        }
-                        // If the selectedDevice is not null, we can proceed with connecting to the device
-                        if (selectedDevice != null) {
-                            // Create a BluetoothSocket and connect to the device
-                            BluetoothSocket socket = selectedDevice.createRfcommSocketToServiceRecord(UUID.randomUUID());
-                            socket.connect();
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(MainActivity.this, "CONNECTED SUCCESS", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-
-                            OutputStream outputStream = socket.getOutputStream();
-                            outputStream.write("Hello, world!".getBytes());
-                            System.out.println("Message sent to " + socket.getRemoteDevice().getName());
-
-                            InputStream inputStream = socket.getInputStream();
-                            byte[] buffer = new byte[1024];
-                            int bytesRead = inputStream.read(buffer);
-                            String response = new String(buffer, 0, bytesRead);
-                            System.out.println("Response received: " + response);
-
-
-                            // Remember to close the socket when you're done
-                            socket.close();
-                        } else {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    initBluetoothList(bluetoothList);
-                                }
-                            });
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
                 }).start();
             }
