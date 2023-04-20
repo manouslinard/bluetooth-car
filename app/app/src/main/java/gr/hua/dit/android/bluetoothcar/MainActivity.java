@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private Button back_btn;
     private Button left_btn;
     private Button right_btn;
+    private Button connect_btn;
     private Switch autoSwitch;
     private Switch lineSwitch;
     private int REQUEST_ENABLE_BT = 1;
@@ -45,25 +46,25 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, BluetoothDevice> bluetoothDevices;
     private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private OutputStream outputStream = null;
+    private String selectedItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        bluetoothDevices = new HashMap<String, BluetoothDevice>();
-//        initMovementButtons();
-//        // Request Bluetooth permission if not granted already
-//        if (ContextCompat.checkSelfPermission(this, BLUETOOTH_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this, new String[]{BLUETOOTH_PERMISSION}, REQUEST_BLUETOOTH_PERMISSION);
-//        } else {
-//            // Bluetooth permission already granted, proceed with Bluetooth operations
-//            // ...
-//        }
-//        bluetoothList.add("No Devices Available");  // remove this when bluetooth devices found (use bluetoothList.remove(0);)
-//
-//        initBluetoothList(bluetoothList);   // sets the values of the list to dropdown list in gui.
-        String address = "00:21:13:00:26:FF";
-        connectToAddress(address);
+        bluetoothDevices = new HashMap<String, BluetoothDevice>();
+        selectedItem = null;
+        initMovementButtons();
+        // Request Bluetooth permission if not granted already
+        if (ContextCompat.checkSelfPermission(this, BLUETOOTH_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{BLUETOOTH_PERMISSION}, REQUEST_BLUETOOTH_PERMISSION);
+        } else {
+            // Bluetooth permission already granted, proceed with Bluetooth operations
+            // ...
+        }
+        bluetoothList.add("No Devices Available");  // remove this when bluetooth devices found (use bluetoothList.remove(0);)
+
+        initBluetoothList(bluetoothList);   // sets the values of the list to dropdown list in gui.
         initMovementButtons();
     }
 
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         right_btn = findViewById(R.id.right_button);
         autoSwitch = findViewById(R.id.auto_switch);
         lineSwitch = findViewById(R.id.line_switch);
+        connect_btn = findViewById(R.id.connect_button);
 
         // Basic Movement Buttons Initialized =================
         fwd_btn.setOnClickListener(v -> {
@@ -89,6 +91,16 @@ public class MainActivity extends AppCompatActivity {
 
         left_btn.setOnClickListener(v -> {
             sendCharToArduino('L');
+        });
+
+        connect_btn.setOnClickListener(v->{
+            if (selectedItem == null) {
+                return;
+            }
+            BluetoothDevice b = bluetoothDevices.get(selectedItem);
+            if (b!=null){
+                connectToAddress(b.getAddress());
+            }
         });
 
         right_btn.setOnClickListener(v -> {
@@ -178,16 +190,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 // Get the selected item
-                String selectedItem = (String) adapterView.getItemAtPosition(i);
+                selectedItem = (String) adapterView.getItemAtPosition(i);
                 // Do something with the selected item, such as connecting to the Bluetooth device
                 connectBluetooth(selectedItem);
-                BluetoothDevice b = bluetoothDevices.get(selectedItem);
-                if (b!=null){
-                    //Toast.makeText(MainActivity.this, ""+bluetoothDevices.get(selectedItem), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(MainActivity.this, ""+b.getAddress(), Toast.LENGTH_SHORT).show();
-                    String address = "00:21:13:00:16:FF";
-
-                }
             }
 
             @Override
@@ -213,13 +218,6 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         BluetoothDevice selectedDevice = null;
                         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                                // TODO: Consider calling
-                                //    ActivityCompat#requestPermissions
-                                // here to request the missing permissions, and then overriding
-                                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                //                                          int[] grantResults)
-                                // to handle the case where the user grants the permission. See the documentation
-                                // for ActivityCompat#requestPermissions for more details.
                             return;
                         }
                         Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
