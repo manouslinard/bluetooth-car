@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -40,12 +42,14 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> bluetoothList = new ArrayList<>(); // TODO: initialize bluetooth list
     private int REQUEST_BLUETOOTH_PERMISSION = 1;
     private static final String BLUETOOTH_PERMISSION = Manifest.permission.BLUETOOTH;
+    private Map<String, BluetoothDevice> bluetoothDevices;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bluetoothDevices = new HashMap<String, BluetoothDevice>();
         initMovementButtons();
         // Request Bluetooth permission if not granted already
         if (ContextCompat.checkSelfPermission(this, BLUETOOTH_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
@@ -128,9 +132,9 @@ public class MainActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 // Get the selected item
                 String selectedItem = (String) adapterView.getItemAtPosition(i);
-
                 // Do something with the selected item, such as connecting to the Bluetooth device
                 connectBluetooth(selectedItem);
+                Toast.makeText(MainActivity.this, ""+bluetoothDevices.get(selectedItem), Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -152,12 +156,10 @@ public class MainActivity extends AppCompatActivity {
                         REQUEST_BLUETOOTH_PERMISSION);
             } else {
                 // Start a new thread to connect to the selected Bluetooth device
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            BluetoothDevice selectedDevice = null;
-                            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                new Thread(() -> {
+                    try {
+                        BluetoothDevice selectedDevice = null;
+                        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                                 // TODO: Consider calling
                                 //    ActivityCompat#requestPermissions
                                 // here to request the missing permissions, and then overriding
@@ -165,55 +167,55 @@ public class MainActivity extends AppCompatActivity {
                                 //                                          int[] grantResults)
                                 // to handle the case where the user grants the permission. See the documentation
                                 // for ActivityCompat#requestPermissions for more details.
-                                return;
-                            }
-                            Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-                            if (pairedDevices.size() > 0) {
-                                bluetoothList.clear(); // Clear the list before adding new devices
-                                for (BluetoothDevice device : pairedDevices) {
-                                    String deviceNameAddress = device.getName() + "\n" + device.getAddress();
-                                    bluetoothList.add(deviceNameAddress);
-                                    if (deviceNameAddress.equals(selectedItem)) {
-                                        selectedDevice = device;
-                                    }
+                            return;
+                        }
+                        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+                        if (pairedDevices.size() > 0) {
+                            bluetoothList.clear(); // Clear the list before adding new devices
+                            for (BluetoothDevice device : pairedDevices) {
+                                // String deviceNameAddress = device.getName() + "\n" + device.getAddress();
+                                bluetoothList.add(device.getName());
+                                bluetoothDevices.put(device.getName(), device);
+                                if (device.getName().equals(selectedItem)) {
+                                    selectedDevice = device;
                                 }
                             }
-                            // If the selectedDevice is not null, we can proceed with connecting to the device
-                            if (selectedDevice != null) {
-                                // Create a BluetoothSocket and connect to the device
-                                BluetoothSocket socket = selectedDevice.createRfcommSocketToServiceRecord(UUID.randomUUID());
-                                socket.connect();
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        Toast.makeText(MainActivity.this, "CONNECTED SUCCESS", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-
-                                OutputStream outputStream = socket.getOutputStream();
-                                outputStream.write("Hello, world!".getBytes());
-                                System.out.println("Message sent to " + socket.getRemoteDevice().getName());
-
-                                InputStream inputStream = socket.getInputStream();
-                                byte[] buffer = new byte[1024];
-                                int bytesRead = inputStream.read(buffer);
-                                String response = new String(buffer, 0, bytesRead);
-                                System.out.println("Response received: " + response);
-
-
-                                // Remember to close the socket when you're done
-                                socket.close();
-                            } else {
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        initBluetoothList(bluetoothList);
-                                    }
-                                });
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
+                        // If the selectedDevice is not null, we can proceed with connecting to the device
+                        if (selectedDevice != null) {
+                            // Create a BluetoothSocket and connect to the device
+                            BluetoothSocket socket = selectedDevice.createRfcommSocketToServiceRecord(UUID.randomUUID());
+                            socket.connect();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MainActivity.this, "CONNECTED SUCCESS", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                            OutputStream outputStream = socket.getOutputStream();
+                            outputStream.write("Hello, world!".getBytes());
+                            System.out.println("Message sent to " + socket.getRemoteDevice().getName());
+
+                            InputStream inputStream = socket.getInputStream();
+                            byte[] buffer = new byte[1024];
+                            int bytesRead = inputStream.read(buffer);
+                            String response = new String(buffer, 0, bytesRead);
+                            System.out.println("Response received: " + response);
+
+
+                            // Remember to close the socket when you're done
+                            socket.close();
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    initBluetoothList(bluetoothList);
+                                }
+                            });
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
                 }).start();
             }
@@ -226,8 +228,11 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_BLUETOOTH_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, proceed with Bluetooth operations
-                // ...
+                Spinner spinner = findViewById(R.id.bluet_list);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                        android.R.layout.simple_spinner_item, bluetoothList);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(adapter);
             } else {
                 // Permission denied, inform the user
                 Toast.makeText(this, "Bluetooth permission denied", Toast.LENGTH_SHORT).show();
