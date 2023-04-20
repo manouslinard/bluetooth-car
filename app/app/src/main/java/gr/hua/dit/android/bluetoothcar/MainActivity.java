@@ -22,7 +22,6 @@ import android.Manifest;
 
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -197,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
                 // Get the selected item
                 selectedItem = (String) adapterView.getItemAtPosition(i);
                 // Do something with the selected item, such as connecting to the Bluetooth device
@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
                         REQUEST_BLUETOOTH_PERMISSION);
             } else {
                 // Start a new thread to connect to the selected Bluetooth device
-                new Thread(() -> {
+
                     BluetoothDevice selectedDevice = null;
                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                         return;
@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
                             bluetoothDevices.put(device.getName(), device);
                         }
                     }
-                }).start();
+
             }
         }
     }
