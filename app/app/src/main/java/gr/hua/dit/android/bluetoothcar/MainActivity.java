@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 //        initBluetoothList(bluetoothList);   // sets the values of the list to dropdown list in gui.
         String address = "00:21:13:00:26:FF";
         connectToAddress(address);
+        initMovementButtons();
     }
 
     private void initMovementButtons() {
@@ -79,19 +80,19 @@ public class MainActivity extends AppCompatActivity {
 
         // Basic Movement Buttons Initialized =================
         fwd_btn.setOnClickListener(v -> {
-            // TODO: Send 'F' character.
+            sendCharToArduino('F');
         });
 
         back_btn.setOnClickListener(v -> {
-            // TODO: Send 'B' character.
+            sendCharToArduino('B');
         });
 
         left_btn.setOnClickListener(v -> {
-            // TODO: Send 'L' character.
+            sendCharToArduino('L');
         });
 
         right_btn.setOnClickListener(v -> {
-            // TODO: Send 'R' character.
+            sendCharToArduino('R');
         });
         // ====================================================
 
@@ -100,22 +101,22 @@ public class MainActivity extends AppCompatActivity {
             if (isChecked) {
                 // Switch is ON
                 handleButtons(lineSwitch, false);
-                // TODO: Send 'V' character.
+                sendCharToArduino('V');
             } else {
                 // Switch is OFF
                 handleButtons(lineSwitch, true);
-                // TODO: Send 'v' character.
+                sendCharToArduino('v');
             }
         });
         lineSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 // Switch is ON
                 handleButtons(autoSwitch, false);
-                // TODO: Send 'X' character.
+                sendCharToArduino('X');
             } else {
                 // Switch is OFF
                 handleButtons(autoSwitch, true);
-                // TODO: Send 'x' character.
+                sendCharToArduino('x');
             }
         });
         // =====================================================
@@ -144,7 +145,6 @@ public class MainActivity extends AppCompatActivity {
             outputStream = null;
             try {
                 outputStream = btSocket.getOutputStream();
-                sendCharToArduino('F');
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -156,6 +156,9 @@ public class MainActivity extends AppCompatActivity {
 
     // Method to send a character to Arduino via Bluetooth
     public void sendCharToArduino(char c) {
+        if (outputStream == null) {
+            return;
+        }
         try {
             outputStream.write(c);
         } catch (IOException e) {
