@@ -1,9 +1,11 @@
 package gr.hua.dit.android.bluetoothcar;
 
+import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -31,7 +33,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-
+@SuppressLint("UseSwitchCompatOrMaterialCode")
 public class MainActivity extends AppCompatActivity {
 
     private Button fwd_btn;
@@ -50,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     private OutputStream outputStream = null;
     private String selectedItem;
     private boolean buttonIsPressed = false;
+    private BluetoothSocket btSocket;
+    private boolean idle = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         initBluetoothList(bluetoothList);   // sets the values of the list to dropdown list in gui.
         initMovementButtons();
     }
+    @SuppressLint("ClickableViewAccessibility")
     private void initMovementButtons() {
         /**
          * Initializes all the movement button click listeners.
@@ -166,6 +171,16 @@ public class MainActivity extends AppCompatActivity {
         // ====================================================
 
         connect_btn.setOnClickListener(v -> {
+            if (connect_btn.getText().equals("Disconnect")){
+                try {
+                    stopIdle();
+                    btSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                connect_btn.setText("Connect");
+                return;
+            }
             if (selectedItem == null) {
                 return;
             }
@@ -201,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void startAction(char c) {
         buttonIsPressed = true;
+        idle = false;
         new Thread(new Runnable() {
             public void run() {
                 while (buttonIsPressed) {
@@ -208,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
                     sendCharToArduino(c);
                     System.out.println("Button pressed " + c);
                     try {
-                        Thread.sleep(200); // Wait for 200 milliseconds before executing again
+                        Thread.sleep(100); // Wait for 200 milliseconds before executing again
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -219,6 +235,32 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopAction() {
         buttonIsPressed = false;
+        if (btSocket.isConnected()) {
+            startIdle();
+        }
+        // Stop executing the action here
+        System.out.println("Button released");
+    }
+
+    private void startIdle() {
+        idle = true;
+        new Thread(new Runnable() {
+            public void run() {
+                while (idle) {
+                    // Execute your action repeatedly here
+                    sendCharToArduino('S');
+                    try {
+                        Thread.sleep(100); // Wait for 200 milliseconds before executing again
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private void stopIdle() {
+        idle = false;
         // Stop executing the action here
         System.out.println("Button released");
     }
@@ -231,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        BluetoothSocket btSocket = null; // uuid is the UUID of the Bluetooth service that the device uses
+        btSocket = null; // uuid is the UUID of the Bluetooth service that the device uses
         try {
             ParcelUuid[] uuids = bluetoothDevice.getUuids();
             if (uuids != null) {
@@ -253,6 +295,8 @@ public class MainActivity extends AppCompatActivity {
             outputStream = null;
             try {
                 outputStream = btSocket.getOutputStream();
+                startIdle();
+                connect_btn.setText("Disconnect");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -361,4 +405,9 @@ public class MainActivity extends AppCompatActivity {
         s.setEnabled(enable);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopIdle();
+    }
 }
