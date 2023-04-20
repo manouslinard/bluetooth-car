@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.ParcelUuid;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");    // default value for bluetooth module
     private OutputStream outputStream = null;
     private String selectedItem;
+    private boolean buttonIsPressed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         initBluetoothList(bluetoothList);   // sets the values of the list to dropdown list in gui.
         initMovementButtons();
     }
-
     private void initMovementButtons() {
         /**
          * Initializes all the movement button click listeners.
@@ -81,30 +83,94 @@ public class MainActivity extends AppCompatActivity {
         connect_btn = findViewById(R.id.connect_button);
 
         // Basic Movement Buttons Initialized =================
-        fwd_btn.setOnClickListener(v -> {
-            sendCharToArduino('F');
+        fwd_btn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('F');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
         });
 
-        back_btn.setOnClickListener(v -> {
-            sendCharToArduino('B');
+        back_btn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('B');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
         });
 
-        left_btn.setOnClickListener(v -> {
-            sendCharToArduino('L');
+        left_btn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('L');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
         });
 
 
-        right_btn.setOnClickListener(v -> {
-            sendCharToArduino('R');
+        right_btn.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('R');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
         });
         // ====================================================
 
-        connect_btn.setOnClickListener(v->{
+        connect_btn.setOnClickListener(v -> {
             if (selectedItem == null) {
                 return;
             }
             BluetoothDevice b = bluetoothDevices.get(selectedItem);
-            if (b!=null){
+            if (b != null) {
                 connectToAddress(b.getAddress());
             }
         });
@@ -132,9 +198,32 @@ public class MainActivity extends AppCompatActivity {
                 sendCharToArduino('x');
             }
         });
-        // =====================================================
-
     }
+    private void startAction(char c) {
+        buttonIsPressed = true;
+        new Thread(new Runnable() {
+            public void run() {
+                while (buttonIsPressed) {
+                    // Execute your action repeatedly here
+                    sendCharToArduino(c);
+                    System.out.println("Button pressed " + c);
+                    try {
+                        Thread.sleep(200); // Wait for 200 milliseconds before executing again
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+    }
+
+    private void stopAction() {
+        buttonIsPressed = false;
+        // Stop executing the action here
+        System.out.println("Button released");
+    }
+
+
 
     private void connectToAddress(String deviceAddress) {
         BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
