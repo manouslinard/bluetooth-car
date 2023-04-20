@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.ParcelUuid;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -40,11 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private Switch autoSwitch;
     private Switch lineSwitch;
     private int REQUEST_ENABLE_BT = 1;
-    private ArrayList<String> bluetoothList = new ArrayList<>(); // TODO: initialize bluetooth list
+    private ArrayList<String> bluetoothList = new ArrayList<>();
     private int REQUEST_BLUETOOTH_PERMISSION = 1;
     private static final String BLUETOOTH_PERMISSION = Manifest.permission.BLUETOOTH;
     private Map<String, BluetoothDevice> bluetoothDevices;
-    private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");    // default value for bluetooth module
     private OutputStream outputStream = null;
     private String selectedItem;
 
@@ -143,6 +144,12 @@ public class MainActivity extends AppCompatActivity {
         }
         BluetoothSocket btSocket = null; // uuid is the UUID of the Bluetooth service that the device uses
         try {
+            ParcelUuid[] uuids = bluetoothDevice.getUuids();
+            if (uuids != null) {
+                for (ParcelUuid u : uuids) {
+                    uuid = u.getUuid();
+                }
+            }
             btSocket = bluetoothDevice.createRfcommSocketToServiceRecord(uuid);
         } catch (IOException e) {
             e.printStackTrace();
