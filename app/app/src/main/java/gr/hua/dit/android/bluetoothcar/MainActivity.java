@@ -290,12 +290,35 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         try {
+            Toast.makeText(MainActivity.this, "Connecting...", Toast.LENGTH_SHORT).show();
             btSocket.connect(); // connect to the device
             Toast.makeText(MainActivity.this, "Connected to device", Toast.LENGTH_SHORT).show();
             outputStream = null;
             try {
                 outputStream = btSocket.getOutputStream();
                 startIdle();
+                new Thread(() -> {
+                    while (true) {
+                        try {
+                            Thread.sleep(1000); // Wait for 1 second before checking the connection
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        // Check if the connection is lost
+                        try {
+                            btSocket.getInputStream().read(); // Throws IOException if connection is lost
+                        } catch (IOException e) {
+                            runOnUiThread(() -> {
+                                if (idle) { // if still idle & error in inputStream -> connection lost.
+                                    Toast.makeText(MainActivity.this, "Connection Lost.", Toast.LENGTH_SHORT).show();
+                                    stopIdle();
+                                    connect_btn.setText("Connect");
+                                }
+                            });
+                            break;
+                        }
+                    }
+                }).start();
                 connect_btn.setText("Disconnect");
             } catch (IOException e) {
                 e.printStackTrace();

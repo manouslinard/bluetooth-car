@@ -22,7 +22,7 @@ bool ultraPilot = false;
 long max_obs_dist = 30;
 int rot_delay_ultraPilot = 1; // seconds
 
-int motor1_speed = 150;
+int motor1_speed = 120;
 int motor2_speed = 255;
 int motor3_speed = 255;
 int motor4_speed = 210;
@@ -183,7 +183,7 @@ void forward()
 {
   motor1.setSpeed(motor1_speed); //Define maximum velocity
   motor1.run(FORWARD); //rotate the motor anti-clockwise
-  motor2.setSpeed(motor2_speed); //Define maximum velocity
+  motor2.setSpeed(120); //Define maximum velocity
   motor2.run(FORWARD); //rotate the motor anti-clockwise
   motor3.setSpeed(motor3_speed); //Define maximum velocity
   motor3.run(FORWARD);  //rotate the motor clockwise
@@ -195,7 +195,7 @@ void back()
 {
   motor1.setSpeed(motor1_speed); //Define maximum velocity
   motor1.run(BACKWARD);  //rotate the motor clockwise
-  motor2.setSpeed(motor2_speed); //Define maximum velocity
+  motor2.setSpeed(245); //Define maximum velocity
   motor2.run(BACKWARD);  //rotate the motor clockwise
   motor3.setSpeed(motor3_speed); //Define maximum velocity
   motor3.run(BACKWARD); //rotate the motor anti-clockwise
