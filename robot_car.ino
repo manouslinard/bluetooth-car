@@ -23,7 +23,7 @@ long max_obs_dist = 30;
 int rot_delay_ultraPilot = 1; // seconds
 
 int motor1_speed = 120;
-int motor2_speed = 255;
+int motor2_speed = 183;
 int motor3_speed = 255;
 int motor4_speed = 210;
 
@@ -31,7 +31,10 @@ int motor_rotate_speed = 150;
 
 char command;
 
+int inc_step_btn = 10;
+
 bool followLine = false;
+bool doOnce = true;
 int dark_value = 500; // above this value -> detects dark line.
 int sensor_limit = 100;
 const int sensorMiddle = A5; // Analog input pin for the sensor
@@ -52,8 +55,13 @@ void loop() {
   //Serial.println(analogRead(sensorMiddle)); // Print the value to the serial monitor
   //Serial.println(measureDist());
   if (bluetoothSerial.available() > 0) {
+    if (doOnce){
+      // sends once in the beggining the velocities.
+      send_bluet();
+      doOnce = false;
+    }
     command = bluetoothSerial.read();
-
+    // Serial.print(String(motor1_speed) + ", " + String(motor2_speed) + ", " + String(motor3_speed) + ", " + String(motor4_speed));
     Stop(); //initialize with motors stoped
     if (command != 'S') {
       Serial.println(command);
@@ -96,9 +104,85 @@ void loop() {
           // auto-pilot with obstacle avoidance.
           ultraPilot = true;
           break;
+        case '0':
+          // decrease top left motor speed.
+          motor1_speed-=inc_step_btn;
+          if (motor1_speed < 0) {
+            motor1_speed = 0;
+          }
+          send_bluet();
+          break;
+        case '1':
+          // increase top left motor speed.
+          motor1_speed+=inc_step_btn;
+          if (motor1_speed > 255) { 
+            motor1_speed = 255;
+          }
+          send_bluet();
+          break;
+        case '2':
+          // decrease top right motor speed.
+          motor4_speed-=inc_step_btn;
+          if (motor4_speed < 0) {
+            motor4_speed = 0;
+          }
+          send_bluet();
+          break;
+        case '3':
+          // increase top right motor speed.
+          motor4_speed+=inc_step_btn;
+          if (motor4_speed > 255) { 
+            motor4_speed=255;
+          }
+          send_bluet();
+          break;
+        case '4':
+          // decrease bottom right motor speed.
+          motor3_speed-=inc_step_btn;
+          if (motor3_speed < 0) {
+            motor3_speed = 0;
+          }
+          send_bluet();
+          break;
+        case '5':
+          // increase bottom right motor speed.
+          motor3_speed+=inc_step_btn;
+          if (motor3_speed > 255) { 
+            motor3_speed=255;
+          }
+          send_bluet();
+          break;
+        case '6':
+          // decrease bottom left motor speed.
+          motor2_speed-=inc_step_btn;
+          if (motor2_speed < 0) {
+            motor2_speed = 0;
+          }
+          send_bluet();
+          break;
+        case '7':
+          // increase bottom left motor speed.
+          motor2_speed+=inc_step_btn;
+          if (motor2_speed > 255) { 
+            motor2_speed = 255;
+          }
+          send_bluet();
+          break;
       }
     }
   }
+}
+
+void send_bluet(){
+    String json = "{";
+    json += "\"motor1_speed\":" + String(motor1_speed) + ",";
+    json += "\"motor2_speed\":" + String(motor2_speed) + ",";
+    json += "\"motor3_speed\":" + String(motor3_speed) + ",";
+    json += "\"motor4_speed\":" + String(motor4_speed);
+    json += "}";
+
+    // Send the JSON-like string via Bluetooth
+    bluetoothSerial.println(json);
 }
 
 void followLineFunc()
@@ -183,7 +267,7 @@ void forward()
 {
   motor1.setSpeed(motor1_speed); //Define maximum velocity
   motor1.run(FORWARD); //rotate the motor anti-clockwise
-  motor2.setSpeed(120); //Define maximum velocity
+  motor2.setSpeed(motor2_speed); //Define maximum velocity
   motor2.run(FORWARD); //rotate the motor anti-clockwise
   motor3.setSpeed(motor3_speed); //Define maximum velocity
   motor3.run(FORWARD);  //rotate the motor clockwise
@@ -195,7 +279,7 @@ void back()
 {
   motor1.setSpeed(motor1_speed); //Define maximum velocity
   motor1.run(BACKWARD);  //rotate the motor clockwise
-  motor2.setSpeed(245); //Define maximum velocity
+  motor2.setSpeed(motor2_speed); //Define maximum velocity
   motor2.run(BACKWARD);  //rotate the motor clockwise
   motor3.setSpeed(motor3_speed); //Define maximum velocity
   motor3.run(BACKWARD); //rotate the motor anti-clockwise
