@@ -41,6 +41,22 @@ public class MainActivity extends AppCompatActivity {
     private Button left_btn;
     private Button right_btn;
     private Button connect_btn;
+
+    private Button top_left_plus;
+
+    private Button top_left_minus;
+
+    private Button bottom_left_plus;
+
+    private Button bottom_left_minus;
+
+    private Button top_right_plus;
+
+    private Button top_right_minus;
+
+    private Button bottom_right_plus;
+
+    private Button bottom_right_minus;
     private Switch autoSwitch;
     private Switch lineSwitch;
     private int REQUEST_ENABLE_BT = 1;
@@ -61,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         bluetoothDevices = new HashMap<String, BluetoothDevice>();
         selectedItem = null;
-        initMovementButtons();
+
         // Request Bluetooth permission if not granted already
         if (ContextCompat.checkSelfPermission(this, BLUETOOTH_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{BLUETOOTH_PERMISSION}, REQUEST_BLUETOOTH_PERMISSION);
@@ -73,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
         initBluetoothList(bluetoothList);   // sets the values of the list to dropdown list in gui.
         initMovementButtons();
+        initSpeedButtons();
     }
     @SuppressLint("ClickableViewAccessibility")
     private void initMovementButtons() {
@@ -213,6 +230,178 @@ public class MainActivity extends AppCompatActivity {
                 sendCharToArduino('x');
             }
         });
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void initSpeedButtons(){
+        top_left_plus = findViewById(R.id.top_left_plus);
+        top_left_minus = findViewById(R.id.top_left_minus);
+        bottom_left_plus = findViewById(R.id.bottom_left_plus);
+        bottom_left_minus = findViewById(R.id.bottom_left_minus);
+        top_right_plus = findViewById(R.id.top_right_plus);
+        top_right_minus = findViewById(R.id.top_right_minus);
+        bottom_right_plus = findViewById(R.id.bottom_right_plus);
+        bottom_right_minus = findViewById(R.id.bottom_right_minus);
+        top_left_plus.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('1');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        top_left_minus.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('0');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        bottom_left_plus.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('7');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        bottom_left_minus.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('6');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        top_right_plus.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('3');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        top_right_minus.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('2');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        bottom_right_plus.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('5');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
+        });
+
+        bottom_right_minus.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        // Button pressed
+                        startAction('4');
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        // Button released
+                        stopAction();
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        // Button moved while pressed
+                        return true;
+                }
+                return false;
+            }
+        });
+
     }
     private void startAction(char c) {
         buttonIsPressed = true;
@@ -379,18 +568,18 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 // Start a new thread to connect to the selected Bluetooth device
 
-                    BluetoothDevice selectedDevice = null;
-                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                        return;
+                BluetoothDevice selectedDevice = null;
+                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    return;
+                }
+                Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+                if (pairedDevices.size() > 0) {
+                    bluetoothList.clear(); // Clear the list before adding new devices
+                    for (BluetoothDevice device : pairedDevices) {
+                        bluetoothList.add(device.getName());
+                        bluetoothDevices.put(device.getName(), device);
                     }
-                    Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-                    if (pairedDevices.size() > 0) {
-                        bluetoothList.clear(); // Clear the list before adding new devices
-                        for (BluetoothDevice device : pairedDevices) {
-                            bluetoothList.add(device.getName());
-                            bluetoothDevices.put(device.getName(), device);
-                        }
-                    }
+                }
 
             }
         }
