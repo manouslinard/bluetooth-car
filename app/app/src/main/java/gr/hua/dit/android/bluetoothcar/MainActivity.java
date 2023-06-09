@@ -21,11 +21,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.Manifest;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +63,12 @@ public class MainActivity extends AppCompatActivity {
     private Button bottom_right_plus;
 
     private Button bottom_right_minus;
+
+    private TextView top_left_text_sp;
+    private TextView top_right_text_sp;
+    private TextView bottom_left_text_sp;
+    private TextView bottom_right_text_sp;
+
     private Switch autoSwitch;
     private Switch lineSwitch;
     private int REQUEST_ENABLE_BT = 1;
@@ -234,6 +246,10 @@ public class MainActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void initSpeedButtons(){
+        top_left_text_sp = findViewById(R.id.top_left_text);
+        top_right_text_sp = findViewById(R.id.top_right_text);
+        bottom_left_text_sp = findViewById(R.id.bottom_left_text);
+        bottom_right_text_sp = findViewById(R.id.bottom_right_text);
         top_left_plus = findViewById(R.id.top_left_plus);
         top_left_minus = findViewById(R.id.top_left_minus);
         bottom_left_plus = findViewById(R.id.bottom_left_plus);
@@ -486,6 +502,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 outputStream = btSocket.getOutputStream();
                 startIdle();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(btSocket.getInputStream()));
                 new Thread(() -> {
                     while (true) {
                         try {
@@ -495,7 +512,26 @@ public class MainActivity extends AppCompatActivity {
                         }
                         // Check if the connection is lost
                         try {
-                            btSocket.getInputStream().read(); // Throws IOException if connection is lost
+                            String receivedData = bufferedReader.readLine();
+                            try {
+                                JSONObject jsonObject = new JSONObject(receivedData);
+                                int motor1Speed = jsonObject.getInt("motor1_speed");
+                                int motor2Speed = jsonObject.getInt("motor2_speed");
+                                int motor3Speed = jsonObject.getInt("motor3_speed");
+                                int motor4Speed = jsonObject.getInt("motor4_speed");
+                                if (Integer.parseInt(top_left_text_sp.getText().toString()) != motor1Speed || Integer.parseInt(top_right_text_sp.getText().toString()) != motor4Speed || Integer.parseInt(bottom_right_text_sp.getText().toString()) != motor3Speed || Integer.parseInt(bottom_left_text_sp.getText().toString()) != motor2Speed) {
+                                    runOnUiThread(() -> {
+                                        // Toast.makeText(MainActivity.this, "Received: " + motor1Speed, Toast.LENGTH_SHORT).show();
+                                        top_left_text_sp.setText("" + motor1Speed);
+                                        top_right_text_sp.setText("" + motor4Speed);
+                                        bottom_right_text_sp.setText("" + motor3Speed);
+                                        bottom_left_text_sp.setText("" + motor2Speed);
+                                    });
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
                         } catch (IOException e) {
                             runOnUiThread(() -> {
                                 if (idle) { // if still idle & error in inputStream -> connection lost.

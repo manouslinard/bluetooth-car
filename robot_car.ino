@@ -34,6 +34,7 @@ char command;
 int inc_step_btn = 10;
 
 bool followLine = false;
+bool doOnce = true;
 int dark_value = 500; // above this value -> detects dark line.
 int sensor_limit = 100;
 const int sensorMiddle = A5; // Analog input pin for the sensor
@@ -54,6 +55,11 @@ void loop() {
   //Serial.println(analogRead(sensorMiddle)); // Print the value to the serial monitor
   //Serial.println(measureDist());
   if (bluetoothSerial.available() > 0) {
+    if (doOnce){
+      // sends once in the beggining the velocities.
+      send_bluet();
+      doOnce = false;
+    }
     command = bluetoothSerial.read();
     // Serial.print(String(motor1_speed) + ", " + String(motor2_speed) + ", " + String(motor3_speed) + ", " + String(motor4_speed));
     Stop(); //initialize with motors stoped
@@ -104,6 +110,7 @@ void loop() {
           if (motor1_speed < 0) {
             motor1_speed = 0;
           }
+          send_bluet();
           break;
         case '1':
           // increase top left motor speed.
@@ -111,13 +118,15 @@ void loop() {
           if (motor1_speed > 255) { 
             motor1_speed = 255;
           }
+          send_bluet();
           break;
         case '2':
           // decrease top right motor speed.
           motor4_speed-=inc_step_btn;
           if (motor4_speed < 0) {
             motor4_speed = 0;
-          }        
+          }
+          send_bluet();
           break;
         case '3':
           // increase top right motor speed.
@@ -125,6 +134,7 @@ void loop() {
           if (motor4_speed > 255) { 
             motor4_speed=255;
           }
+          send_bluet();
           break;
         case '4':
           // decrease bottom right motor speed.
@@ -132,6 +142,7 @@ void loop() {
           if (motor3_speed < 0) {
             motor3_speed = 0;
           }
+          send_bluet();
           break;
         case '5':
           // increase bottom right motor speed.
@@ -139,6 +150,7 @@ void loop() {
           if (motor3_speed > 255) { 
             motor3_speed=255;
           }
+          send_bluet();
           break;
         case '6':
           // decrease bottom left motor speed.
@@ -146,6 +158,7 @@ void loop() {
           if (motor2_speed < 0) {
             motor2_speed = 0;
           }
+          send_bluet();
           break;
         case '7':
           // increase bottom left motor speed.
@@ -153,10 +166,23 @@ void loop() {
           if (motor2_speed > 255) { 
             motor2_speed = 255;
           }
+          send_bluet();
           break;
       }
     }
   }
+}
+
+void send_bluet(){
+    String json = "{";
+    json += "\"motor1_speed\":" + String(motor1_speed) + ",";
+    json += "\"motor2_speed\":" + String(motor2_speed) + ",";
+    json += "\"motor3_speed\":" + String(motor3_speed) + ",";
+    json += "\"motor4_speed\":" + String(motor4_speed);
+    json += "}";
+
+    // Send the JSON-like string via Bluetooth
+    bluetoothSerial.println(json);
 }
 
 void followLineFunc()
