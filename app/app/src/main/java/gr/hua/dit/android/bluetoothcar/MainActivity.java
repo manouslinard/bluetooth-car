@@ -102,7 +102,37 @@ public class MainActivity extends AppCompatActivity {
         initBluetoothList(bluetoothList);   // sets the values of the list to dropdown list in gui.
         initMovementButtons();
         initSpeedButtons();
+        handleAllButtons(false);
     }
+
+
+    private void handleAllButtons(boolean state){
+        /**
+         * Handles the state of all buttons, switches and velocity textviews.
+         * Param: state: if true, enables all buttons, switches & velocity textviews, else it disables them.
+         */
+        runOnUiThread(() -> {
+            fwd_btn.setEnabled(state);
+            back_btn.setEnabled(state);
+            left_btn.setEnabled(state);
+            right_btn.setEnabled(state);
+            autoSwitch.setEnabled(state);
+            lineSwitch.setEnabled(state);
+            top_left_text_sp.setEnabled(state);
+            top_right_text_sp.setEnabled(state);
+            bottom_left_text_sp.setEnabled(state);
+            bottom_right_text_sp.setEnabled(state);
+            top_left_plus.setEnabled(state);
+            top_left_minus.setEnabled(state);
+            bottom_left_plus.setEnabled(state);
+            bottom_left_minus.setEnabled(state);
+            top_right_plus.setEnabled(state);
+            top_right_minus.setEnabled(state);
+            bottom_right_plus.setEnabled(state);
+            bottom_right_minus.setEnabled(state);
+        });
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     private void initMovementButtons() {
         /**
@@ -208,6 +238,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 connect_btn.setText("Connect");
+                handleAllButtons(false);
                 return;
             }
             if (selectedItem == null) {
@@ -498,6 +529,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Connecting...", Toast.LENGTH_SHORT).show();
             btSocket.connect(); // connect to the device
             Toast.makeText(MainActivity.this, "Connected to device", Toast.LENGTH_SHORT).show();
+            handleAllButtons(true);
             outputStream = null;
             try {
                 outputStream = btSocket.getOutputStream();
@@ -538,6 +570,7 @@ public class MainActivity extends AppCompatActivity {
                                     Toast.makeText(MainActivity.this, "Connection Lost.", Toast.LENGTH_SHORT).show();
                                     stopIdle();
                                     connect_btn.setText("Connect");
+                                    handleAllButtons(false);
                                 }
                             });
                             break;
