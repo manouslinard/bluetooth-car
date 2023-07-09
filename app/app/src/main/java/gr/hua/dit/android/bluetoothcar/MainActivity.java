@@ -11,6 +11,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.ParcelUuid;
 import android.util.Log;
@@ -19,6 +21,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -69,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView bottom_left_text_sp;
     private TextView bottom_right_text_sp;
 
+    private ImageView robot_image;
+
     private Switch autoSwitch;
     private Switch lineSwitch;
     private int REQUEST_ENABLE_BT = 1;
@@ -98,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
             // ...
         }
         bluetoothList.add("No Devices Available");  // remove this when bluetooth devices found (use bluetoothList.remove(0);)
-
+        robot_image = findViewById(R.id.robot_image);
         initBluetoothList(bluetoothList);   // sets the values of the list to dropdown list in gui.
         initMovementButtons();
         initSpeedButtons();
@@ -130,6 +135,11 @@ public class MainActivity extends AppCompatActivity {
             top_right_minus.setEnabled(state);
             bottom_right_plus.setEnabled(state);
             bottom_right_minus.setEnabled(state);
+            if (state) {
+                robot_image.setColorFilter(null);
+            } else {
+                robot_image.setColorFilter(Color.BLACK, PorterDuff.Mode.MULTIPLY);
+            }
         });
     }
 

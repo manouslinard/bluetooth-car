@@ -56,7 +56,8 @@
         app:layout_constraintHorizontal_bias="0.738"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.882" />
+        app:layout_constraintVertical_bias="0.882"
+        android:enabled="false" />
 
     <Button
         android:id="@+id/bottom_left_minus"
@@ -280,7 +281,7 @@
         app:layout_constraintVertical_bias="0.112" />
 
     <ImageView
-        android:id="@+id/my_image"
+        android:id="@+id/robot_image"
         android:layout_width="118dp"
         android:layout_height="192dp"
         android:src="@drawable/robot"
@@ -289,8 +290,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.87"
-        android:enabled="false" />
+        app:layout_constraintVertical_bias="0.87" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
