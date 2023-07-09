@@ -17,7 +17,7 @@
         app:layout_constraintHorizontal_bias="0.738"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
+        android:enabled="false"
         app:layout_constraintVertical_bias="0.749" />
 
     <Button
@@ -30,7 +30,7 @@
         app:layout_constraintHorizontal_bias="0.919"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
+        android:enabled="false"
         app:layout_constraintVertical_bias="0.749" />
 
     <Button
@@ -43,7 +43,8 @@
         app:layout_constraintHorizontal_bias="0.919"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.882" />
+        app:layout_constraintVertical_bias="0.882"
+        android:enabled="false" />
 
     <Button
         android:id="@+id/bottom_right_plus"
@@ -67,7 +68,7 @@
         app:layout_constraintHorizontal_bias="0.266"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
+        android:enabled="false"
         app:layout_constraintVertical_bias="0.882" />
 
     <Button
@@ -80,7 +81,7 @@
         app:layout_constraintHorizontal_bias="0.086"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
+        android:enabled="false"
         app:layout_constraintVertical_bias="0.882" />
 
     <Button
@@ -93,7 +94,8 @@
         app:layout_constraintHorizontal_bias="0.086"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.749" />
+        app:layout_constraintVertical_bias="0.749"
+        android:enabled="false" />
 
     <Button
         android:id="@+id/top_left_minus"
@@ -106,7 +108,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
-        app:layout_constraintVertical_bias="0.749" />
+        app:layout_constraintVertical_bias="0.749"
+        android:enabled="false" />
 
     <Button
         android:id="@+id/fwd_button"
@@ -117,7 +120,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.386" />
+        app:layout_constraintVertical_bias="0.386"
+        android:enabled="false" />
 
     <Button
         android:id="@+id/left_button"
@@ -129,7 +133,8 @@
         app:layout_constraintHorizontal_bias="0.198"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.491" />
+        app:layout_constraintVertical_bias="0.491"
+        android:enabled="false"/>
 
     <Button
         android:id="@+id/connect_button"
@@ -153,7 +158,8 @@
         app:layout_constraintHorizontal_bias="0.77"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.491" />
+        app:layout_constraintVertical_bias="0.491"
+        android:enabled="false"/>
 
     <Button
         android:id="@+id/back_button"
@@ -165,7 +171,8 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.595" />
+        app:layout_constraintVertical_bias="0.595"
+        android:enabled="false"/>
 
 
     <Switch
@@ -178,7 +185,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.781"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:enabled="false" />
 
     <Switch
         android:id="@+id/auto_switch"
@@ -190,7 +198,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.226"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:enabled="false" />
 
     <TextView
         android:id="@+id/textView"
@@ -280,7 +289,8 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.87" />
+        app:layout_constraintVertical_bias="0.87"
+        android:enabled="false" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
